@@ -3,6 +3,7 @@ package vistas;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class VistaReproductor extends JFrame {
@@ -35,8 +36,8 @@ public class VistaReproductor extends JFrame {
         panelStats.setPreferredSize(new Dimension(320, 0));
 
         Font fuenteStats = new Font("Monospaced", Font.BOLD, 12);
-        Component[] componentes = {lblHeapMem, lblOffHeapMem, lblCpuUso, lblTiempoLectura, lblBufferEstado};
-        
+        Component[] componentes = { lblHeapMem, lblOffHeapMem, lblCpuUso, lblTiempoLectura, lblBufferEstado };
+
         for (Component comp : componentes) {
             comp.setFont(fuenteStats);
             panelStats.add(comp);
@@ -54,6 +55,10 @@ public class VistaReproductor extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    public void actualizarImagenVideo(BufferedImage imagen) {
+        panelVideo.actualizarImagen(imagen);
+    }
+
     public JButton getBtnSeleccionar() {
         return btnSeleccionar;
     }
@@ -65,5 +70,4 @@ public class VistaReproductor extends JFrame {
         return (res == JFileChooser.APPROVE_OPTION) ? fileChooser.getSelectedFile() : null;
     }
 
-    
 }

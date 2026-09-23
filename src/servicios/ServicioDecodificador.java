@@ -11,6 +11,7 @@ public class ServicioDecodificador {
 
     public static final int TAMAÑO_MAXIMO_COLA = 30;
     private final OperatingSystemMXBean beanSO = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+    private boolean ejecutando = false;
 
     public record ContenedorFrame(Frame frame, long tiempo) {
     }
@@ -22,8 +23,12 @@ public class ServicioDecodificador {
 
     private final BlockingQueue<ContenedorFrame> cola = new ArrayBlockingQueue<>(TAMAÑO_MAXIMO_COLA);
 
-    public void iniciarDecodificacion(String rutaVideo) {
+    public boolean isEjecutando() {
+        return ejecutando;
+    }
 
+    public void iniciarDecodificacion(String rutaVideo) {
+        ejecutando = true;
         try {
             var grabber = new FFmpegFrameGrabber(rutaVideo);
             grabber.start();
@@ -38,6 +43,8 @@ public class ServicioDecodificador {
             }
         } catch (Exception ex) {
             System.err.println("Error en el SERVICIO de Decodificación: " + ex.getMessage());
+        } finally {
+            ejecutando = false;
         }
     }
 
