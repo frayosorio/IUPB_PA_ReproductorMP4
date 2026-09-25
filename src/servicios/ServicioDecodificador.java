@@ -54,6 +54,7 @@ public class ServicioDecodificador {
 
     public void detener() {
         this.cola.clear();
+        ejecutando = false;
     }
 
     public Metricas getMetricas(long tiempoLectura) {

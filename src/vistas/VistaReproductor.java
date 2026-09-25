@@ -3,8 +3,11 @@ package vistas;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+
+import servicios.ServicioDecodificador;
 
 public class VistaReproductor extends JFrame {
 
@@ -59,9 +62,9 @@ public class VistaReproductor extends JFrame {
         panelVideo.actualizarImagen(imagen);
     }
 
-    public JButton getBtnSeleccionar() {
-        return btnSeleccionar;
-    }
+   public void setSelecionarClick(ActionListener escuchadorEventos){
+        btnSeleccionar.addActionListener(escuchadorEventos);
+   }
 
     public File solicitarArchivoVideo() {
         JFileChooser fileChooser = new JFileChooser();
@@ -69,5 +72,13 @@ public class VistaReproductor extends JFrame {
         int res = fileChooser.showOpenDialog(this);
         return (res == JFileChooser.APPROVE_OPTION) ? fileChooser.getSelectedFile() : null;
     }
+	
+	public void actualizarTelemetria(ServicioDecodificador.Metricas metricas){
+		lblHeapMem.setText(String.format("Heap JVM:          %d MB", metricas.memoriaHeapMB()));
+		lblOffHeapMem.setText(String.format("Off-Heap / Nativa: %d MB", metricas.memoriaOffHeapMB()));
+		lblCpuUso.setText(String.format("Uso CPU Global:    %.1f %%", metricas.porcentajeUsoCPU()));
+		lblTiempoLectura.setText(String.format("Lectura I/O:       %d ms", metricas.tiempoLectura()));
+		lblBufferEstado.setText(String.format("Estado Búfer:      %d / %d", metricas.ocupacionCola(), ServicioDecodificador.TAMAÑO_MAXIMO_COLA));
+	}
 
 }
