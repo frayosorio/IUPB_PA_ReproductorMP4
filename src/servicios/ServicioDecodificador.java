@@ -37,7 +37,7 @@ public class ServicioDecodificador {
             while ((frameOriginal = grabber.grabFrame()) != null) {
                 long tiempoInicial = System.nanoTime();
                 Frame frameClonado = frameOriginal.clone();
-                long tiempo = (System.nanoTime() - tiempoInicial);
+                long tiempo = (System.nanoTime() - tiempoInicial)/1000000;
 
                 cola.put(new ContenedorFrame(frameClonado, tiempo));
             }

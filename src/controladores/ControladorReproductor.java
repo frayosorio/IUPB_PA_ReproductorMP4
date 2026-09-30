@@ -3,18 +3,22 @@ package controladores;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 import servicios.ServicioDecodificador;
+import servicios.TiempoServicio;
 import vistas.VistaReproductor;
 
 import java.awt.image.BufferedImage;
 
 public class ControladorReproductor {
 
+    private final int TIEMPO_PAUSA = 200;
+    private final int TIEMPO_FRAME = 33;
+
     private final VistaReproductor vista;
     private final ServicioDecodificador servicio;
     private long ultimoTiempo;
 
     public ControladorReproductor(VistaReproductor vista,
-            ServicioDecodificador servicio) {
+                                  ServicioDecodificador servicio) {
         this.vista = vista;
         this.servicio = servicio;
 
@@ -35,8 +39,15 @@ public class ControladorReproductor {
                     vista.actualizarImagenVideo(imgRenderizada);
 
                     frameARenderizar.frame().close();
-                }
 
+
+                }
+                //hacer pausa de acuerdo al tiempo real de reproducción
+
+                long tiempoTranscurrido = System.currentTimeMillis() - inicio;
+                long tiempoPausa = Math.max(0, TIEMPO_FRAME - tiempoTranscurrido);
+                //TiempoServicio.pausarMilisegundos(tiempoPausa);
+                Thread.sleep(tiempoPausa);
             }
         } catch (Exception ex) {
             System.err.println("[Controlador] Error en el ciclo de renderizado: " + ex.getMessage());
@@ -46,8 +57,9 @@ public class ControladorReproductor {
     private void cicloTelemetria() {
         while (servicio.isEjecutando()) {
             ServicioDecodificador.Metricas metricas = servicio.getMetricas(ultimoTiempo);
-			vista.actualizarTelemetria(metricas);
-            
+            vista.actualizarTelemetria(metricas);
+
+            TiempoServicio.pausarMilisegundos(TIEMPO_PAUSA);
         }
     }
 
