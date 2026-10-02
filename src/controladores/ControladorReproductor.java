@@ -10,8 +10,8 @@ import java.awt.image.BufferedImage;
 
 public class ControladorReproductor {
 
-    private final int TIEMPO_PAUSA = 200;
-    private final int TIEMPO_FRAME = 33;
+    private final int TIEMPO_PAUSA = 200; // Muestreo 5 veces por segundo
+    private final int TIEMPO_FRAME = 33; // 30 FPS -> 1000 ms/30
 
     private final VistaReproductor vista;
     private final ServicioDecodificador servicio;
@@ -30,24 +30,20 @@ public class ControladorReproductor {
             while (servicio.isEjecutando()) {
                 long inicio = System.currentTimeMillis();
 
-                ServicioDecodificador.ContenedorFrame frameARenderizar = servicio.getSiguienteFrame();
-                if (frameARenderizar != null) {
-                    ultimoTiempo = frameARenderizar.tiempo();
+                ServicioDecodificador.ContenedorFrame contenedorARenderizar = servicio.getSiguienteFrame();
+                if (contenedorARenderizar != null) {
+                    ultimoTiempo = contenedorARenderizar.tiempo();
 
-                    BufferedImage imgRenderizada = conversor.convert(frameARenderizar.frame());
-
+                    BufferedImage imgRenderizada = conversor.convert(contenedorARenderizar.frame());
                     vista.actualizarImagenVideo(imgRenderizada);
-
-                    frameARenderizar.frame().close();
-
-
+                    contenedorARenderizar.frame().close();
                 }
                 //hacer pausa de acuerdo al tiempo real de reproducción
-
+                //30 FPS
                 long tiempoTranscurrido = System.currentTimeMillis() - inicio;
                 long tiempoPausa = Math.max(0, TIEMPO_FRAME - tiempoTranscurrido);
-                //TiempoServicio.pausarMilisegundos(tiempoPausa);
-                Thread.sleep(tiempoPausa);
+                //Thread.sleep(tiempoPausa);
+                TiempoServicio.pausarMilisegundos(tiempoPausa);
             }
         } catch (Exception ex) {
             System.err.println("[Controlador] Error en el ciclo de renderizado: " + ex.getMessage());
@@ -58,7 +54,6 @@ public class ControladorReproductor {
         while (servicio.isEjecutando()) {
             ServicioDecodificador.Metricas metricas = servicio.getMetricas(ultimoTiempo);
             vista.actualizarTelemetria(metricas);
-
             TiempoServicio.pausarMilisegundos(TIEMPO_PAUSA);
         }
     }
@@ -69,10 +64,10 @@ public class ControladorReproductor {
             return;
 
         // hilo PRODUCTOR (genera los frames a reproducir y los encola)
-        new Thread(() -> servicio.iniciarDecodificacion(archivo.getAbsolutePath())).start();
+        new Thread(() -> servicio.iniciarDecodificacion(archivo.getAbsolutePath()), "Hilo Decodificacion").start();
 
         // hilo CONSUMIDOR (obtiene los frames encolados y los muestra)
-        new Thread(this::cicloRenderizado).start();
+        new Thread(this::cicloRenderizado, "Hilo Renderizado").start();
 
         // hilo TELEMETRIA
         new Thread(this::cicloTelemetria, "Hilo Telemetria").start();

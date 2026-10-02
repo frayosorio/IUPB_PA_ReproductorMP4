@@ -29,12 +29,11 @@ public class ServicioDecodificador {
 
     public void iniciarDecodificacion(String rutaVideo) {
         ejecutando = true;
-        try {
-            var grabber = new FFmpegFrameGrabber(rutaVideo);
+        try (var grabber = new FFmpegFrameGrabber(rutaVideo)) {
             grabber.start();
 
             Frame frameOriginal;
-            while ((frameOriginal = grabber.grabFrame()) != null) {
+            while (ejecutando && (frameOriginal = grabber.grabImage()) != null) {
                 long tiempoInicial = System.nanoTime();
                 Frame frameClonado = frameOriginal.clone();
                 long tiempo = (System.nanoTime() - tiempoInicial)/1000000;
@@ -48,7 +47,7 @@ public class ServicioDecodificador {
         }
     }
 
-    public ContenedorFrame getSiguienteFrame() {
+    public ContenedorFrame getSiguienteFrame() throws InterruptedException {
         return cola.poll();
     }
 

@@ -79,6 +79,7 @@ public class VistaReproductor extends JFrame {
 		lblCpuUso.setText(String.format("Uso CPU Global:    %.1f %%", metricas.porcentajeUsoCPU()));
 		lblTiempoLectura.setText(String.format("Lectura I/O:       %d ms", metricas.tiempoLectura()));
 		lblBufferEstado.setText(String.format("Estado Búfer:      %d / %d", metricas.ocupacionCola(), ServicioDecodificador.TAMAÑO_MAXIMO_COLA));
+        pbBuffer.setValue(metricas.ocupacionCola());
 	}
 
 }

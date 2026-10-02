@@ -7,7 +7,7 @@ public class TiempoServicio {
             Thread.sleep(milisegundos);
         } catch (InterruptedException e) {
             e.printStackTrace();
-            //Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt();
         }
     }
 }
