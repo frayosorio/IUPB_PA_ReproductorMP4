@@ -3,6 +3,7 @@ package controladores;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
 import servicios.ServicioDecodificador;
+import servicios.ServicioDetectorRostros;
 import servicios.TiempoServicio;
 import vistas.VistaReproductor;
 
@@ -27,12 +28,15 @@ public class ControladorReproductor {
 
     private void cicloRenderizado() {
         try (var conversor = new Java2DFrameConverter()) {
+            var servicioDetectorRestros=new ServicioDetectorRostros();
             while (servicio.isEjecutando()) {
                 long inicio = System.currentTimeMillis();
 
                 ServicioDecodificador.ContenedorFrame contenedorARenderizar = servicio.getSiguienteFrame();
                 if (contenedorARenderizar != null) {
                     ultimoTiempo = contenedorARenderizar.tiempo();
+
+                    servicioDetectorRestros.detectarRostros(contenedorARenderizar.frame());
 
                     BufferedImage imgRenderizada = conversor.convert(contenedorARenderizar.frame());
                     vista.actualizarImagenVideo(imgRenderizada);
